@@ -22,9 +22,15 @@ int main()
 {
     int n,k;
     int result;
-    
+    while(1){
     printf("Compute n choose k, please enter n & k :\n");
     scanf("%d %d",&n,&k);
+    
+    if(n < k)
+    {
+         fprintf(stderr,"input error!");
+         exit(EXIT_FAILURE);
+    }
     
     if(2*k > n) k = (n-k);
     
@@ -37,5 +43,6 @@ int main()
     printf("result = %d(recursive function)\n",result);
         
     system("pause");
+}
     return 0;
 }
