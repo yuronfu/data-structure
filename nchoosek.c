@@ -43,6 +43,6 @@ int main()
     printf("result = %d(recursive function)\n",result);
         
     system("pause");
-}
+    }
     return 0;
 }
