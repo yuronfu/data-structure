@@ -27,7 +27,7 @@ void MatrixInput(int mrow, int mcol, term *M)
                  }
            }
      }
-     M[0].value = total;
+     M[0].value = --total;
 }
 void MatrixPrint(term *M)
 {
@@ -48,7 +48,7 @@ void MatrixPrint(term *M)
 }
 void fastTranspose(term *a,term *b)
 {
-     int i,j,startingPos[a[0].column + 1];
+     int i,j,startingPos[a[0].column];
      
      b[0].row = a[0].column;
      b[0].column = a[0].row;
@@ -56,13 +56,12 @@ void fastTranspose(term *a,term *b)
      
      if(a[0].value > 0)
      {
-                   startingPos[0] = 1;
-                   for(i = 1 ; i <= a[0].column ; i++) startingPos[i] = 0;
-                   for(i = 1 ; i < a[0].value ; i++) startingPos[a[i].column + 1]++;
+                   for(i = 0 ; i < a[0].column ; i++) startingPos[i] = 0;
+                   for(i = 1 ; i <= a[0].value ; i++) startingPos[a[i].column]++;
                    for(i = 1 ; i < a[0].column ; i++) startingPos[i] = startingPos[i] + startingPos[i-1];
-                   for(i = 1 ; i < a[0].value ; i++)
+                   for(i = a[0].value ; i >= 1 ; i--)
                    {
-                         j = startingPos[a[i].column]++;
+                         j = startingPos[a[i].column]--;
                          b[j].row = a[i].column;
                          b[j].column = a[i].row;
                          b[j].value = a[i].value;
