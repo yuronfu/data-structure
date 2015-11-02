@@ -117,7 +117,7 @@ int main()
     scanf("%s",expr);
     
     infix_to_prefix(expr,prefix_expr,strlen(expr)-1);
-    printf("%s",prefix_expr);
+    printf("%s\n",prefix_expr);
     
     system("pause");
     return 0;
