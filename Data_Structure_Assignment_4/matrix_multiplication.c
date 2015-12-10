@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct matrixnode *MatrixPointer;
+typedef struct matrixnode *MatrixPointer;   //refer to textbook
 typedef struct
 {
         int row;
@@ -18,7 +18,7 @@ struct matrixnode
        }u;
 };
 
-MatrixPointer MatrixInput(int mrow,int mcol,MatrixPointer *headnode,int headnodenum)
+MatrixPointer MatrixInput(int mrow,int mcol,MatrixPointer *headnode,int headnodenum) //for input data
 {
               int total = 0,i,j,cellvalue;
               MatrixPointer head,temp,last;
@@ -65,7 +65,7 @@ MatrixPointer MatrixInput(int mrow,int mcol,MatrixPointer *headnode,int headnode
               
               return head;
 }
-void MatrixPrint(MatrixPointer M,MatrixPointer *headnode)
+void MatrixPrint(MatrixPointer M,MatrixPointer *headnode)    //output a matrix
 {
      int i,j;
      MatrixPointer currententry;
@@ -90,11 +90,11 @@ MatrixPointer multiplication(MatrixPointer A,MatrixPointer B,MatrixPointer *head
               int total = 0,i,cellvalue = 0;
               MatrixPointer head,temp,last,headA,headB,entryA,entryB;
               
-              head = malloc(sizeof(*head));
-              head->u.entry.row = A->u.entry.row;
+              head = malloc(sizeof(*head));              //create head, recording matrix info., for result of multiplication
+              head->u.entry.row = A->u.entry.row;        //dim. of result take row from A and column from B
               head->u.entry.col = B->u.entry.col;
               
-              for(i = 0 ; i < headnodenum ; i++)
+              for(i = 0 ; i < headnodenum ; i++)         //construct the headnodes
               {
                     temp = malloc(sizeof(*temp));
                     headnode[i] = temp;
@@ -103,31 +103,32 @@ MatrixPointer multiplication(MatrixPointer A,MatrixPointer B,MatrixPointer *head
               }
               head->right = headnode[0];
               
-              headA = A->right;
+              headA = A->right;              //enter first headnode in headnodes of A
               for(i = 0 ; i < A->u.entry.row ; i++)
               {
-                    last = headnode[i];
-                    entryA = headA->right;
-                    entryB = B->right->down;
+                    last = headnode[i];      //last is a temporary space to link entries into a row
+                    entryA = headA->right;   //enter first entry in current row
+                    entryB = B->right->down; //enter first entry in first column
                     for(headB = B->right ; headB != B ;)
                     {
                               if(entryA == headA || entryB == headB) //scanned over the current row, go back to first entry
                               {                                 //or scanned over the current column, go to the entry of next column
-                                        if(cellvalue)   // has value store it, similar to the part in MatrixInput
+                                        if(cellvalue)   //if having value, store it( similar to the part in MatrixInput)
                                         {
-                                                     temp = malloc(sizeof(*temp));
+                                                     temp = malloc(sizeof(*temp));           //construct the entry node
                                                      temp->u.entry.row = i;
                                                      temp->u.entry.col = headB->down->u.entry.col;
                                                      temp->u.entry.value = cellvalue;
                                                      last->right = temp;
                                                      last = temp;
-                                                     headnode[headB->down->u.entry.col]->u.next->down = temp;
-                                                     headnode[headB->down->u.entry.col]->u.next = temp;
+                                                     headnode[headB->down->u.entry.col]->u.next->down = temp;  //link entry into column
+                                                     headnode[headB->down->u.entry.col]->u.next = temp; 
+                                                               //next of headnode is also a temporary space to link entries into column
                                                      total++;
                                         }
                                         cellvalue = 0;
                                         entryA = headA->right;             //back to first entry
-                                        headB = headB->u.next;               //go to next column
+                                        headB = headB->u.next;             //go to next column
                                         entryB = headB->down;              //first entry of next column
                               }
                               else switch((entryA->u.entry.col == entryB->u.entry.row)? 0:(entryA->u.entry.col < entryB->u.entry.row)? -1:1)
@@ -145,7 +146,7 @@ MatrixPointer multiplication(MatrixPointer A,MatrixPointer B,MatrixPointer *head
                               }
                     }
                     last->right = headnode[i]; //close row list
-                    headA = headA->u.next;
+                    headA = headA->u.next;     //go to next row of A
               }
               head->u.entry.value = total;
               
@@ -154,6 +155,27 @@ MatrixPointer multiplication(MatrixPointer A,MatrixPointer B,MatrixPointer *head
               headnode[headnodenum-1]->u.next = head; //last headnode requires to point to head
               
               return head;
+}
+void MatrixFree(MatrixPointer M,MatrixPointer *headnode)
+{
+     int i,j;
+     MatrixPointer currententry,x;
+     
+     for(i = 0 ; i < M->u.entry.row ; i++)
+     {
+           currententry = headnode[i]->right;
+           for(j = 0 ; j < M->u.entry.col ; j++)
+           {
+                 if(i == currententry->u.entry.row && j == currententry->u.entry.col)
+                 {
+                      x = currententry;
+                      currententry = currententry->right;
+                      free(x);
+                 }
+           }
+           free(headnode[i]);
+     }
+     free(M);
 }
 int main()
 {
@@ -177,15 +199,19 @@ int main()
     //MatrixPrint(A,headnodeA);
     //MatrixPrint(B,headnodeB);
     
-    if(A->u.entry.col == B->u.entry.row)
+    if(A->u.entry.col == B->u.entry.row)             //checking if we can multiple A by B
     {
                       headnodenum = (A->u.entry.row > B->u.entry.col)? A->u.entry.row:B->u.entry.col;
                       MatrixPointer headnodeC[headnodenum];
                       C = multiplication(A,B,headnodeC,headnodenum); //C = A*B
                       printf("\nthe result of A*B:\n");
                       MatrixPrint(C,headnodeC);
+                      MatrixFree(C,headnodeC);
     }
-    else printf("Error! number of columns of A  is not equal to number of rows of B");
+    else printf("Error! number of columns of A  is not equal to number of rows of B\n");
+    
+    MatrixFree(A,headnodeA);
+    MatrixFree(B,headnodeB);
     
     system("pause");
     return 0;
